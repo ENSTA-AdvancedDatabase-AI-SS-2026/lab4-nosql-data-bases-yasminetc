@@ -1,0 +1,23 @@
+# Ajouter vente
+def add_sale(product_id, quantity):
+    r.zincrby("leaderboard", quantity, product_id)
+
+# Top produits
+def top_products(n=10):
+    return r.zrevrange("leaderboard", 0, n-1, withscores=True)
+
+# Rang d’un produit
+def get_rank(product_id):
+    return r.zrevrank("leaderboard", product_id)
+
+# Classement par catégorie
+def top_products_by_category(category, n=5):
+    products = r.smembers(f"category:{category}")
+    result = []
+
+    for p in products:
+        score = r.zscore("leaderboard", p)
+        if score:
+            result.append((p, score))
+
+    return sorted(result, key=lambda x: x[1], reverse=True)[:n]
