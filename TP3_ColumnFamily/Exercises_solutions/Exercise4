@@ -1,0 +1,10 @@
+--  4.2 TWCS
+ALTER TABLE mesures_par_capteur
+WITH compaction = {
+  'class': 'TimeWindowCompactionStrategy',
+  'compaction_window_unit': 'DAYS',
+  'compaction_window_size': 1
+};
+
+--  4.3 TTL restant
+SELECT TTL(tension) FROM mesures_par_capteur LIMIT 10;
