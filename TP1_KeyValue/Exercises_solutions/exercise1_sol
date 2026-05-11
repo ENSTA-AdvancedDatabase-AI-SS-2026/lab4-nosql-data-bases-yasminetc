@@ -1,1 +1,43 @@
 
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
+
+# 🔹 1. Stocker un produit (Hash)
+def save_product(product_id, name, price, stock):
+    key = f"product:{product_id}"
+    r.hset(key, mapping={
+        "name": name,
+        "price": price,
+        "stock": stock
+    })
+
+def get_product(product_id):
+    return r.hgetall(f"product:{product_id}")
+
+
+# 🔹 2. Gestion panier (Hash)
+def add_to_cart(user_id, product_id, quantity):
+    key = f"cart:{user_id}"
+    r.hincrby(key, product_id, quantity)
+
+def get_cart(user_id):
+    return r.hgetall(f"cart:{user_id}")
+
+
+# 🔹 3. Historique navigation (List)
+def add_history(user_id, product_id):
+    key = f"history:{user_id}"
+    r.lpush(key, product_id)
+    r.ltrim(key, 0, 9)  # garder 10 derniers
+
+def get_history(user_id):
+    return r.lrange(f"history:{user_id}", 0, -1)
+
+
+# 🔹 4. Produits par catégorie (Set)
+def add_product_to_category(category, product_id):
+    r.sadd(f"category:{category}", product_id)
+
+def get_products_by_category(category):
+    return r.smembers(f"category:{category}")
