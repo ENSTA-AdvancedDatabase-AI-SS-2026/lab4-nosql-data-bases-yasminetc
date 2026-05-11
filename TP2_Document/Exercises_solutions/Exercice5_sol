@@ -1,1 +1,39 @@
-
+Ex5 — Lookup
+ 5.1 Jointure patients + analyses
+db.patients.aggregate([
+  {
+    $lookup: {
+      from: "analyses",
+      localField: "_id",
+      foreignField: "patient_id",
+      as: "analyses"
+    }
+  }
+]);
+ 5.2 Glycémie élevée
+db.analyses.find({
+  type: "Glycémie",
+  "resultats.valeur": { $gt: 1.26 }
+});
+ 5.3 Statistiques par wilaya
+db.analyses.aggregate([
+  {
+    $lookup: {
+      from: "patients",
+      localField: "patient_id",
+      foreignField: "_id",
+      as: "patient"
+    }
+  },
+  { $unwind: "$patient" },
+  {
+    $group: {
+      _id: "$patient.adresse.wilaya",
+      anomalies: {
+        $sum: {
+          $cond: [{ $gt: ["$resultats.valeur", 1.26] }, 1, 0]
+        }
+      }
+    }
+  }
+]);
