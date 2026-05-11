@@ -1,0 +1,32 @@
+Ex2 — Requêtes de base
+2.1 Diabétiques > 50 ans à Alger
+db.patients.find({
+  antecedents: "Diabète",
+  "adresse.wilaya": "Alger",
+  dateNaissance: { $lte: ISODate("1974-01-01") }
+});
+2.2 Allergie + 3 consultations
+db.patients.find({
+  allergies: "Pénicilline",
+  "consultations.2": { $exists: true }
+});
+2.3 Dernière consultation seulement
+db.patients.find(
+  {},
+  {
+    nom: 1,
+    prenom: 1,
+    consultations: { $slice: -1 }
+  }
+);
+2.4 Sans antécédents + tension élevée
+db.patients.find({
+  antecedents: { $size: 0 },
+  "consultations.tension.systolique": { $gt: 140 }
+});
+2.5 Recherche textuelle
+db.patients.createIndex({ "consultations.diagnostic": "text" });
+
+db.patients.find({
+  $text: { $search: "hypertension diabète" }
+});
