@@ -1,1 +1,81 @@
-
+Ex3 — Agrégation avancée
+3.1 Diagnostics par wilaya
+db.patients.aggregate([
+  { $unwind: "$consultations" },
+  {
+    $group: {
+      _id: {
+        wilaya: "$adresse.wilaya",
+        diagnostic: "$consultations.diagnostic"
+      },
+      count: { $sum: 1 }
+    }
+  }
+]);
+3.2 Médicament le plus prescrit
+db.patients.aggregate([
+  { $unwind: "$consultations" },
+  { $unwind: "$consultations.medicaments" },
+  {
+    $group: {
+      _id: {
+        specialite: "$consultations.medecin.specialite",
+        medicament: "$consultations.medicaments.nom"
+      },
+      count: { $sum: 1 }
+    }
+  },
+  { $sort: { count: -1 } }
+]);
+3.3 Évolution mensuelle
+db.patients.aggregate([
+  { $unwind: "$consultations" },
+  {
+    $group: {
+      _id: {
+        year: { $year: "$consultations.date" },
+        month: { $month: "$consultations.date" }
+      },
+      count: { $sum: 1 }
+    }
+  },
+  { $sort: { "_id.year": 1, "_id.month": 1 } }
+]);
+3.4 Patients à risque
+db.patients.aggregate([
+  {
+    $match: {
+      antecedents: { $all: ["Diabète", "HTA"] }
+    }
+  },
+  {
+    $addFields: {
+      age: {
+        $dateDiff: {
+          startDate: "$dateNaissance",
+          endDate: "$$NOW",
+          unit: "year"
+        }
+      }
+    }
+  },
+  { $match: { age: { $gt: 60 } } }
+]);
+3.5 Top médecins
+db.patients.aggregate([
+  { $unwind: "$consultations" },
+  {
+    $group: {
+      _id: "$consultations.medecin.nom",
+      total: { $sum: 1 },
+      patients: { $addToSet: "$_id" }
+    }
+  },
+  {
+    $project: {
+      total: 1,
+      taux_reconsultation: { $size: "$patients" }
+    }
+  },
+  { $sort: { total: -1 } }
+]);
