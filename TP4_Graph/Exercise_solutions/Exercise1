@@ -1,0 +1,34 @@
+--  1.1 Créer étudiants
+UNWIND range(1,50) AS i
+CREATE (:Etudiant {
+  id: i,
+  prenom: "Etudiant" + i,
+  universite: ["USTHB","UMBB","USTO","UMC","UBMA"][i % 5],
+  filiere: "Informatique",
+  annee: 3,
+  ville: "Alger"
+});
+--  1.2 Cours, clubs, compétences
+CREATE (:Cours {code:"INFO401", intitule:"BDD Avancées"});
+CREATE (:Club {nom:"Club IA", universite:"USTHB"});
+CREATE (:Entreprise {nom:"Sonatrach"});
+CREATE (:Competence {nom:"Python"});
+CREATE (:Competence {nom:"Machine Learning"});
+--  1.3 Relations
+MATCH (a:Etudiant), (b:Etudiant)
+WHERE a.id <> b.id AND rand() < 0.1
+CREATE (a)-[:CONNAIT {depuis:2023}]->(b);
+
+MATCH (e:Etudiant), (c:Cours)
+CREATE (e)-[:SUIT {note:15}]->(c);
+
+MATCH (e:Etudiant), (comp:Competence {nom:"Python"})
+CREATE (e)-[:MAITRISE {niveau:"intermediaire"}]->(comp);
+--  1.4 Import CSV
+LOAD CSV WITH HEADERS FROM 'file:///students.csv' AS row
+MERGE (e:Etudiant { id: row.id })
+SET e.prenom = row.prenom,
+    e.nom = row.nom,
+    e.universite = row.universite,
+    e.filiere = row.filiere,
+    e.annee = toInteger(row.annee);
