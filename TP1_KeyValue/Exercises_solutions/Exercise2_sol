@@ -1,0 +1,16 @@
+SESSION_TTL = 1800
+
+def create_session(session_id, user_id):
+    key = f"session:{session_id}"
+    r.set(key, user_id, ex=SESSION_TTL)
+
+def get_session(session_id):
+    key = f"session:{session_id}"
+    user = r.get(key)
+    if user:
+        # sliding expiration
+        r.expire(key, SESSION_TTL)
+    return user
+
+def delete_session(session_id):
+    r.delete(f"session:{session_id}")
