@@ -1,0 +1,17 @@
+import random
+
+N = 10000
+latencies = []
+
+for _ in range(N):
+    key = random.randint(1, 100000)
+
+    t1 = time.time()
+
+    # redis.get(f"key:{key}")
+
+    t2 = time.time()
+    latencies.append((t2 - t1) * 1000)
+
+print("P50:", statistics.median(latencies))
+print("P95:", sorted(latencies)[int(0.95*N)])
