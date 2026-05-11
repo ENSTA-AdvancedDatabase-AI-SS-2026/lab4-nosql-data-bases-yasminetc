@@ -1,0 +1,47 @@
+from cassandra.cluster import Cluster
+from cassandra.query import BatchStatement
+import uuid, random, time
+from datetime import datetime, timedelta
+
+cluster = Cluster(["127.0.0.1"])
+session = cluster.connect("smartgrid")
+
+def generate_data():
+    return {
+        "capteur_id": uuid.uuid4(),
+        "date": datetime.now().date(),
+        "timestamp": datetime.now(),
+        "tension": random.uniform(180, 260),
+        "courant": random.uniform(1, 10),
+        "puissance": random.uniform(100, 1000)
+    }
+
+start = time.time()
+
+batch = BatchStatement()
+
+for i in range(50000):
+    data = generate_data()
+    alerte = data["tension"] < 200 or data["tension"] > 240
+
+    batch.add("""
+        INSERT INTO mesures_par_capteur
+        (capteur_id, date, timestamp, tension, courant, puissance, alerte)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+    """, (
+        data["capteur_id"],
+        data["date"],
+        data["timestamp"],
+        data["tension"],
+        data["courant"],
+        data["puissance"],
+        alerte
+    ))
+
+    if i % 100 == 0:
+        session.execute(batch)
+        batch = BatchStatement()
+
+end = time.time()
+
+print("Débit:", 50000 / (end - start), "mesures/sec")
