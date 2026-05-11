@@ -81,14 +81,13 @@ Objectif :
 
 ##  5. Tableau de décision
 
-| Critère           | Redis       | MongoDB     | Cassandra     | Neo4j       |
-|------------------|------------|-------------|---------------|------------|
-| Débit écriture   | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Débit lecture    | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Requêtes complexes | ⭐ | ⭐⭐⭐⭐ | ⭐⭐ | ⭐⭐⭐⭐⭐ |
-| Scalabilité      | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | ⭐⭐⭐ |
-| Use case         | Cache | Documents | IoT / Logs | Graphe |
-
+| Critère            | Redis        | MongoDB     | Cassandra     | Neo4j        |
+|--------------------|-------------|-------------|---------------|--------------|
+| Débit écriture     | Très élevé  | Élevé       | Très élevé    | Moyen        |
+| Débit lecture      | Très élevé  | Élevé       | Élevé         | Moyen        |
+| Requêtes complexes | Faible      | Élevé       | Limité        | Très élevé   |
+| Scalabilité        | Bonne       | Bonne       | Excellente    | Moyenne      |
+| Use case           | Cache       | Documents   | IoT / Logs    | Graphe       |
 ---
 
 ##  6. Recommandation finale
