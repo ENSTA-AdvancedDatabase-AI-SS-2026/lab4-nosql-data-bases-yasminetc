@@ -1,1 +1,49 @@
+Ex1 — Modélisation et insertion
+//  1.1 Création avec validation
+db.createCollection("patients", {
+  validator: {
+    $jsonSchema: {
+      bsonType: "object",
+      required: ["cin", "nom", "prenom", "dateNaissance", "sexe", "consultations"],
+      properties: {
+        cin: { bsonType: "string" },
+        nom: { bsonType: "string" },
+        prenom: { bsonType: "string" },
+        sexe: { enum: ["M", "F"] },
+        consultations: {
+          bsonType: "array"
+        }
+      }
+    }
 
+});
+// 1.2 Insertion patients
+db.patients.insertMany([
+  {
+    cin: "123456789",
+    nom: "Bensalem",
+    prenom: "Ahmed",
+    dateNaissance: ISODate("1965-05-10"),
+    sexe: "M",
+    adresse: { wilaya: "Alger", commune: "Bab Ezzouar" },
+    antecedents: ["Diabète"],
+    allergies: ["Pénicilline"],
+    consultations: [
+      {
+        date: ISODate("2024-01-10"),
+        diagnostic: "HTA",
+        medecin: { nom: "Dr. Mansouri", specialite: "Cardiologie" },
+        tension: { systolique: 145, diastolique: 90 }
+      }
+    ]
+  }
+]);
+// 1.3 Analyses (collection séparée)
+db.analyses.insertOne({
+  patient_id: ObjectId("..."),
+  date: ISODate("2024-03-10"),
+  type: "Glycémie",
+  resultats: { valeur: 1.30 },
+  laboratoire: "Labo Alger",
+  valide: true
+});
