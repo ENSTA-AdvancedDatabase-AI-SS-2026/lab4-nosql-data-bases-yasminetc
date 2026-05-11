@@ -1,0 +1,26 @@
+--  3.1 Plus court chemin
+MATCH p = shortestPath(
+  (a:Etudiant {prenom:"Ahmed"})-[:CONNAIT*]-(b:Etudiant {prenom:"Yasmina"})
+)
+RETURN p;
+--  3.1 Plus court chemin
+MATCH p = shortestPath(
+  (a:Etudiant {prenom:"Ahmed"})-[:CONNAIT*]-(b:Etudiant {prenom:"Yasmina"})
+)
+RETURN p;
+--  3.3 Communautés (Louvain - GDS)
+CALL gds.louvain.stream({
+  nodeProjection: 'Etudiant',
+  relationshipProjection: 'CONNAIT'
+})
+YIELD nodeId, communityId
+RETURN gds.util.asNode(nodeId).prenom, communityId;
+--  3.4 Recommandation
+MATCH (a:Etudiant {prenom:"Ahmed"})-[:CONNAIT]->(ami)-[:CONNAIT]->(suggestion)
+WHERE NOT (a)-[:CONNAIT]-(suggestion)
+RETURN suggestion, count(*) AS score
+ORDER BY score DESC
+LIMIT 10;
+--  3.5 Chemin compétences
+MATCH (c:Cours)-[:REQUIERT]->(comp:Competence {nom:"Machine Learning"})
+RETURN c;
