@@ -1,0 +1,25 @@
+import time
+import statistics
+
+N = 100000
+latencies = []
+
+start_total = time.time()
+
+for i in range(N):
+    t1 = time.time()
+
+    #  Exemple Redis (adapter pour MongoDB, Cassandra, Neo4j)
+    # redis.set(f"key:{i}", i)
+
+    t2 = time.time()
+    latencies.append((t2 - t1) * 1000)
+
+end_total = time.time()
+
+throughput = N / (end_total - start_total)
+
+print("Débit:", throughput, "ops/sec")
+print("P50:", statistics.median(latencies))
+print("P95:", sorted(latencies)[int(0.95*N)])
+print("P99:", sorted(latencies)[int(0.99*N)])
