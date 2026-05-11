@@ -1,0 +1,21 @@
+--  4.1 Trouver tuteur
+MATCH (e:Etudiant)-[:MAITRISE {niveau:"expert"}]->(:Competence {nom:"Python"}),
+      (e)-[:SUIT {note: >14}]->(:Cours {code:"INFO401"})
+WHERE e.annee >= 4
+RETURN e;
+--  4.2 Réseau alumni
+MATCH (a:Etudiant {prenom:"Ahmed"})-[:CONNAIT*1..3]-(e)
+MATCH (e)-[:A_STAGE_CHEZ]->(:Entreprise {nom:"Sonatrach"})
+RETURN e;
+--  4.3 Ponts (approx)
+MATCH (e:Etudiant)
+WHERE size((e)--()) > 5
+RETURN e;
+--  4.4 Croissance réseau
+MATCH ()-[r:CONNAIT]->()
+RETURN r.depuis, count(*) ORDER BY r.depuis;
+--  4.5 Similarité Jaccard
+MATCH (a:Etudiant {prenom:"Ahmed"})-[:SUIT]->(c)<-[:SUIT]-(other)
+WITH a, other, count(c) AS common
+RETURN other, common
+ORDER BY common DESC;
