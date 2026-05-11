@@ -1,0 +1,16 @@
+from concurrent.futures import ThreadPoolExecutor
+
+def task(i):
+    # lecture + écriture
+    # redis.set(f"k{i}", i)
+    # redis.get(f"k{i}")
+    pass
+
+start = time.time()
+
+with ThreadPoolExecutor(max_workers=50) as executor:
+    executor.map(task, range(10000))
+
+end = time.time()
+
+print("Temps total:", end - start)
