@@ -1,0 +1,30 @@
+## Pipeline (bulk insert)
+def bulk_insert_products(products):
+    pipe = r.pipeline()
+
+    for p in products:
+        pipe.hset(f"product:{p['id']}", mapping=p)
+
+    pipe.execute()
+## Transaction (commande atomique)
+def place_order(user_id, product_id, quantity):
+    pipe = r.pipeline()
+
+    try:
+        pipe.watch(f"product:{product_id}")
+
+        stock = int(r.hget(f"product:{product_id}", "stock"))
+
+        if stock < quantity:
+            pipe.unwatch()
+            return "Stock insuffisant"
+
+        pipe.multi()
+        pipe.hincrby(f"product:{product_id}", "stock", -quantity)
+        pipe.hincrby(f"cart:{user_id}", product_id, quantity)
+        pipe.execute()
+
+        return "Commande réussie"
+
+    except redis.WatchError:
+        return "Conflit, réessayer"
