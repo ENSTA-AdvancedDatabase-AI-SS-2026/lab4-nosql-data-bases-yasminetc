@@ -1,0 +1,21 @@
+--  2.1 Amis d’Ahmed
+MATCH (:Etudiant {prenom:"Ahmed"})-[:CONNAIT]-(ami)
+RETURN ami;
+--  2.2 Amis d’amis
+MATCH (a:Etudiant {prenom:"Ahmed"})-[:CONNAIT*2]-(suggestion)
+WHERE NOT (a)-[:CONNAIT]-(suggestion)
+RETURN suggestion;
+--  2.3 Même cours que Fatima
+MATCH (f:Etudiant {prenom:"Fatima"})-[:SUIT]->(c)<-[:SUIT]-(e)
+WHERE NOT (f)-[:CONNAIT]-(e)
+RETURN e;
+--  2.4 Clubs populaires
+MATCH (e:Etudiant)-[:MEMBRE_DE]->(c:Club)
+RETURN c.nom, count(e) AS membres
+ORDER BY membres DESC;
+--  2.5 Profil complet
+MATCH (e:Etudiant {prenom:"Ahmed"})
+OPTIONAL MATCH (e)-[:CONNAIT]->(amis)
+OPTIONAL MATCH (e)-[:SUIT]->(cours)
+OPTIONAL MATCH (e)-[:MAITRISE]->(comp)
+RETURN e, collect(DISTINCT amis), collect(DISTINCT cours), collect(DISTINCT comp);
