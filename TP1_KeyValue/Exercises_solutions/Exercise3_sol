@@ -1,1 +1,35 @@
+import time
 
+CACHE_TTL = 60
+
+cache_hits = 0
+cache_miss = 0
+
+# Simulation DB
+fake_db = {
+    "1": {"name": "Laptop", "price": 1000}
+}
+
+def get_product_cached(product_id):
+    global cache_hits, cache_miss
+
+    key = f"cache:product:{product_id}"
+
+    # 🔹 1. Try cache
+    data = r.get(key)
+    if data:
+        cache_hits += 1
+        return eval(data)
+
+    # 🔹 2. MISS → DB
+    cache_miss += 1
+    data = fake_db.get(product_id)
+
+    if data:
+        r.set(key, str(data), ex=CACHE_TTL)
+
+    return data
+
+
+def invalidate_cache(product_id):
+    r.delete(f"cache:product:{product_id}")
